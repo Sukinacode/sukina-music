@@ -16,12 +16,13 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // 获取目标路径（NetEase API 使用 /api/... 路径结构）
-    let targetPath = req.url;
-    if (!targetPath || targetPath === '/') targetPath = '/api/search/hot';
-    // 保留 query string
-    const queryIndex = targetPath.indexOf('?');
-    const query = queryIndex >= 0 ? targetPath.slice(queryIndex) : '';
+    // 从 query.path 获取实际 API 路径，加上 /api 前缀（NetEase API 路径结构）
+    let apiPath = '/api/' + (req.query.path || 'search/hot');
+    // 拼接其他 query 参数（排除 path 本身）
+    const params = new URLSearchParams(req.query);
+    params.delete('path');
+    const qs = params.toString();
+    const targetPath = apiPath + (qs ? '?' + qs : '');
 
     // 设置 CORS 响应头
     res.setHeader('Access-Control-Allow-Origin', '*');
