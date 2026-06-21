@@ -6,5 +6,11 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/[...path].js?path=$1" }
-  ]
+  ],
+  "functions": {
+    "api/[...path].js": {
+      "maxDuration": 30,
+      "memory": 256
+    }
+  }
 }

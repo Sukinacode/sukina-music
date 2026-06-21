@@ -29,6 +29,9 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Cookie, Referer, X-Real-IP');
 
+    // 判断是否播放链接请求，使用更宽松的超时
+    const isPlayerUrl = apiPath.includes('/song/enhance/player/url');
+
     return new Promise((resolve) => {
         const options = {
             hostname: TARGET_HOST,
@@ -40,13 +43,12 @@ module.exports = async (req, res) => {
                 'Referer': 'https://music.163.com/',
                 'Accept': 'application/json, text/plain, */*',
                 'Accept-Language': 'zh-CN,zh;q=0.9',
-                'Cookie': 'os=pc; appver=2.10.0;',
+                'Cookie': 'os=pc; appver=2.10.0; channel=netease;',
             },
             rejectUnauthorized: false,
         };
 
         const proxyReq = https.request(options, (proxyRes) => {
-            // 复制响应头（去掉浏览器不友好的安全头）
             const skipHeaders = ['content-security-policy', 'x-frame-options', 'strict-transport-security', 'access-control-allow-origin'];
             Object.keys(proxyRes.headers).forEach(key => {
                 if (!skipHeaders.includes(key.toLowerCase())) {
@@ -64,9 +66,10 @@ module.exports = async (req, res) => {
             resolve();
         });
 
-        proxyReq.setTimeout(15000, () => {
+        // 播放链接接口给更长超时，其他接口较短
+        proxyReq.setTimeout(isPlayerUrl ? 25000 : 12000, () => {
             proxyReq.destroy();
-            res.status(504).json({ code: -1, error: 'Request timeout' });
+            res.status(504).json({ code: -1, error: 'Upstream timeout' });
             resolve();
         });
 
