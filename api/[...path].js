@@ -16,9 +16,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // 获取目标路径（去掉 /api 前缀）
-    let targetPath = req.url.replace(/^\/api/, '');
-    if (!targetPath) targetPath = '/';
+    // 获取目标路径（NetEase API 使用 /api/... 路径结构）
+    let targetPath = req.url;
+    if (!targetPath || targetPath === '/') targetPath = '/api/search/hot';
     // 保留 query string
     const queryIndex = targetPath.indexOf('?');
     const query = queryIndex >= 0 ? targetPath.slice(queryIndex) : '';
