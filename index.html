@@ -533,13 +533,16 @@ async function getQQUrl(mid) {
     return null;
 }
 async function getNEUrl(id) {
-    // Tier 1: Vercel 服务端代理 Meting API，解析302返回真实MP3 URL（避免浏览器端跨域/Referer问题）
+    // Tier 1: Vercel代理 → 网易云官方API获取直接播放链接
     try {
-        const d = await neFetch(`/meting-url?id=${id}`, { timeout: 12000 });
-        if (d && d.code === 200 && d.url) return d.url;
+        const d = await neFetch(`/song/enhance/player/url?id=${id}&ids=[${id}]&br=320000`, { timeout: 15000 });
+        if (d && d.data && d.data[0] && d.data[0].url) {
+            if (d.data[0].freeTrialInfo) toast('💡 VIP歌曲仅30秒试听');
+            return d.data[0].url;
+        }
     } catch { }
 
-    // Tier 2: 直接使用 Meting URL（audio元素原生跟随302，部分网络环境可用）
+    // Tier 2: Meting API URL（audio元素原生跟随302重定向）
     return `${NE2}/?server=netease&type=url&id=${id}`;
 }
 function setPlayIcon(playing) {
