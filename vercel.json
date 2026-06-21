@@ -1,23 +1,12 @@
 {
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/[...path].js" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ],
+  "version": 2,
+  "buildCommand": "",
+  "outputDirectory": ".",
   "functions": {
     "api/[...path].js": {
       "maxDuration": 10,
-      "memory": 256
+      "memory": 256,
+      "includeFiles": "api/**"
     }
-  },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Cookie, Referer, X-Real-IP" }
-      ]
-    }
-  ]
+  }
 }
