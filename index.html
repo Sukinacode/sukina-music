@@ -533,8 +533,13 @@ async function getQQUrl(mid) {
     return null;
 }
 async function getNEUrl(id) {
-    // Meting API → 直接传给audio元素，原生处理302重定向到真实MP3地址
-    // 免VIP、无官方API限流、速度最快
+    // Tier 1: Vercel 服务端代理 Meting API，解析302返回真实MP3 URL（避免浏览器端跨域/Referer问题）
+    try {
+        const d = await neFetch(`/meting-url?id=${id}`, { timeout: 12000 });
+        if (d && d.code === 200 && d.url) return d.url;
+    } catch { }
+
+    // Tier 2: 直接使用 Meting URL（audio元素原生跟随302，部分网络环境可用）
     return `${NE2}/?server=netease&type=url&id=${id}`;
 }
 function setPlayIcon(playing) {
