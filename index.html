@@ -533,50 +533,9 @@ async function getQQUrl(mid) {
     return null;
 }
 async function getNEUrl(id) {
-    // Approach 1: Meting API → 302重定向获取真实MP3链接（最快，不下载完整文件）
-    try {
-        const r = await tFetch(`${NE2}/?server=netease&type=url&id=${id}`, { redirect: 'manual', timeout: 8000 });
-        // Meting 返回 302/301，Location 头包含真实音频URL
-        if (r.status === 301 || r.status === 302 || r.status === 307 || r.status === 308) {
-            const loc = r.headers.get('Location');
-            if (loc) return loc;
-        }
-        // 如果直接返回了 JSON（某些API版本）
-        const ct = r.headers.get('Content-Type') || '';
-        if (ct.includes('json')) {
-            const d = await r.json();
-            if (d && d.url) return d.url;
-        }
-    } catch { /* Meting不可用，继续 */ }
-
-    // Approach 2: Vercel代理 → 网易云官方API（可能返回30秒试听）
-    const quality = loadSettings().quality;
-    const brMap = { 'auto': 999000, '320': 320000, '128': 128000 };
-    const br = brMap[quality] || 999000;
-    try {
-        const d = await neFetch(`/song/enhance/player/url?id=${id}&ids=[${id}]&br=${br}`, { timeout: 10000 });
-        if (d && d.data && d.data[0]) {
-            const item = d.data[0];
-            if (item.url) {
-                if (item.freeTrialInfo) {
-                    console.warn('⚠ VIP歌曲，仅30秒试听');
-                    toast('💡 网易云VIP歌曲仅30秒试听，可切到QQ音源');
-                }
-                return item.url;
-            }
-        }
-    } catch { }
-
-    // Approach 3: 降级128kbps
-    try {
-        const d = await neFetch(`/song/enhance/player/url?id=${id}&ids=[${id}]&br=128000`, { timeout: 8000 });
-        if (d && d.data && d.data[0] && d.data[0].url) {
-            if (d.data[0].freeTrialInfo) toast('💡 网易云VIP歌曲仅30秒试听，可切到QQ音源');
-            return d.data[0].url;
-        }
-    } catch { }
-
-    return null;
+    // Meting API → 直接传给audio元素，原生处理302重定向到真实MP3地址
+    // 免VIP、无官方API限流、速度最快
+    return `${NE2}/?server=netease&type=url&id=${id}`;
 }
 function setPlayIcon(playing) {
     $('playBtn').innerHTML = playing
