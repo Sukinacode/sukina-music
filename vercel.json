@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "functions": {
-    "api/[...path].js": {
-      "maxDuration": 10,
-      "memory": 256,
-      "includeFiles": "api/**"
-    }
-  }
+  "builds": [
+    { "src": "api/[...path].js", "use": "@vercel/node" },
+    { "src": "!api/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/[...path].js" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
 }
