@@ -148,12 +148,12 @@
 // ── Config ──
 const QQ = 'https://qq.sukina.top';
 // 网易云API地址:
-//   - 本地开发: node proxy.js 启动代理，自动使用 localhost:8765
-//   - Vercel部署: index.html 部署到Vercel后自动用 /api 相对路径
-//   - 仅HTML本地打开+远程API: 设为 'https://你的项目名.vercel.app/api'
+//   本地开发: node proxy.js → localhost:8765
+//   双击打开HTML: 自动用 Vercel 远程API
+//   部署到Vercel: 自动用 /api 相对路径
 const NE = location.protocol === 'file:'
-    ? 'http://localhost:8765/api'   // 本地开发
-    : '/api';                        // Vercel部署
+    ? 'https://20260621165942.vercel.app/api'
+    : '/api';
 const NE2 = 'https://api.injahow.cn/meting';
 const CACHE_PREFIX = 'sukina_v2_';
 const CACHE_TTL = 30 * 60 * 1000;
