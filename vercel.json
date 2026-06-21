@@ -1,13 +1,19 @@
 {
   "version": 2,
   "builds": [
+    { "src": "api/meting-url.js", "use": "@vercel/node" },
     { "src": "api/[...path].js", "use": "@vercel/node" },
     { "src": "!api/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/api/meting-url", "dest": "/api/meting-url.js" },
     { "src": "/api/(.*)", "dest": "/api/[...path].js?path=$1" }
   ],
   "functions": {
+    "api/meting-url.js": {
+      "maxDuration": 30,
+      "memory": 256
+    },
     "api/[...path].js": {
       "maxDuration": 30,
       "memory": 256
